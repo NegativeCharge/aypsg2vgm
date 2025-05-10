@@ -132,9 +132,10 @@ void write_psg_data(FILE* f, FILE* p, int rate, double delay) {
     fread(header_check, 1, 4, p);
     assert(header_check[0] == 'P' && header_check[1] == 'S' && header_check[2] == 'G' && header_check[3] == 0x1A);
 
-    uint8_t padding[12];
-    fread(padding, 1, sizeof(padding), p);  // Skip padding in PSG
-
+    // Read metadata/padding bytes
+    uint8_t metadata[12];
+    fread(metadata, 1, sizeof(metadata), p);
+    
     // Read PSG commands and write to VGM file
     while (1) {
         uint8_t data;
@@ -178,12 +179,12 @@ void write_psg_data(FILE* f, FILE* p, int rate, double delay) {
     printf("Sample count: 0x%lx\n", sample_num);
 
     // Finalize VGM with the correct sample count and rate calculation
-    finalize_vgm(f, sample_num, rate, 44100.0 / delay);  // Pass 44100 divided by delay
+    finalize_vgm(f, sample_num, rate, 44100.0 / delay);
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 3) {
-        fprintf(stderr, "Usage: %s <input_psg> <output_vgm> [-r rate] [-t ay_type]\n", argv[0]);
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <input_psg> [output_vgm] [-r rate] [-t ay_type]\n", argv[0]);
         return 1;
     }
 
@@ -193,7 +194,25 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    FILE* f = fopen(argv[2], "wb");
+    char output_filename[1024];
+    if (argc >= 3 && argv[2][0] != '-') {
+        strncpy(output_filename, argv[2], sizeof(output_filename));
+    }
+    else {
+        // Copy input filename and replace extension with .vgm
+        strncpy(output_filename, argv[1], sizeof(output_filename) - 1);
+        output_filename[sizeof(output_filename) - 1] = '\0';
+
+        char* dot = strrchr(output_filename, '.');
+        if (dot) {
+            strcpy(dot, ".vgm");
+        }
+        else {
+            strcat(output_filename, ".vgm");
+        }
+    }
+
+    FILE* f = fopen(output_filename, "wb");
     if (!f) {
         perror("Error opening output VGM file");
         fclose(p);
@@ -204,12 +223,15 @@ int main(int argc, char* argv[]) {
     int ay_type = 1;     // Default AY chip type (AY-3-8910)
 
     // Process optional arguments
-    for (int i = 3; i < argc; i++) {
+    for (int i = 2; i < argc; i++) {
+        if (argv[i][0] != '-') continue;  // Skip non-option arguments (already handled output file)
         if (strcmp(argv[i], "-r") == 0 && i + 1 < argc) {
             rate = atoi(argv[++i]);
+            printf("Setting rate to %d\n", rate);
         }
         else if (strcmp(argv[i], "-t") == 0 && i + 1 < argc) {
             ay_type = atoi(argv[++i]);
+            printf("Setting type to %d\n", ay_type);
         }
     }
 
@@ -224,6 +246,8 @@ int main(int argc, char* argv[]) {
 
     fclose(p);
     fclose(f);
+
+    printf("\nConversion complete.\n");
 
     return 0;
 }
