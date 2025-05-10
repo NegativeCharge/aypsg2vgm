@@ -1,6 +1,6 @@
-# AYPSG to VGM Converter
+# AY PSG to VGM Converter
 
-AYPSG to VGM Converter is a command-line tool written in C++ that converts AY-3-8910 PSG (Programmable Sound Generator) files into VGM (Video Game Music) format. This tool is particularly useful for retro gaming enthusiasts and developers working with ZX Spectrum or other systems using the AY-3-8910 sound chip.
+AY PSG to VGM Converter is a command-line tool written in C++ that converts AY-3-8910 PSG (Programmable Sound Generator) files into VGM (Video Game Music) format. This tool is particularly useful for retro gaming enthusiasts and developers working with ZX Spectrum or other systems using the AY-3-8910 sound chip.
 
 ## Features
 
