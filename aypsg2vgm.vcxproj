@@ -130,6 +130,7 @@
     <ClCompile Include="aypsg2vgm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="LICENSE.md" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
