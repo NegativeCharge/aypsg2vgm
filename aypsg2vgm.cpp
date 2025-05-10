@@ -242,7 +242,7 @@ int main(int argc, char* argv[]) {
     double delay = (ay_type == 1) ? 882 : 735;  // Default 60 Hz or AY type-specific delay
 
     // Write PSG data and finalize the VGM file
-    write_psg_data(f, p, rate, delay);
+    write_psg_data(f, p, 44100.0, delay);
 
     fclose(p);
     fclose(f);
